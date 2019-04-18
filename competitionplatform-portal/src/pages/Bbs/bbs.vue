@@ -55,7 +55,7 @@
                 <p style="text-align: left">{{ data.abstractContent }}</p>
                 <div style="display: flex;">
                   <img src="@/assets/user.png" class="img-user"/>
-                  <span class="span-nickname">{{ data.school }} - {{ data.nickname }}</span>
+                  <span class="span-nickname">{{ data.school.split("_")[2] }} - {{ data.nickname }}</span>
                 </div>
               </el-col>
             </el-row>

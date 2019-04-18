@@ -356,6 +356,14 @@
         requestFindMyTeammates(params).then(function(successRes){
           if (successRes.body.code === 1) {
             that.myTeammates = successRes.body.list;
+            for(var i=0,len=that.myTeammates.length;i<len;i++) {
+              that.myTeammates[i].school = that.myTeammates[i].school.split("_")[2];
+              var skills = that.myTeammates[i].skills.split(",");
+              for(var j=0,l=skills.length;j<l;j++) {
+                skills[j] = skills[j].split("_")[1];
+              }
+              that.myTeammates[i].skills = skills.join(",");
+            }
           }
         },function(errRes){
           console.log(errRes.status);

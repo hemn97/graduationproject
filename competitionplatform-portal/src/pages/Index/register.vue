@@ -40,7 +40,8 @@
             </el-dialog>
           </el-form-item>
           <el-form-item label="学校" prop="school">
-            <el-input size="mini" v-model="form.school" style="width: 250px;"></el-input>
+            <el-cascader placeholder="选择就读学校" :options="schoolOptions" filterable size="mini"
+                         :show-all-levels=false v-model="form.school"></el-cascader>
           </el-form-item>
           <el-form-item class="item-button">
             <el-button size="mini" type="primary" @click="submit" style="width: 120px;">注册</el-button>
@@ -160,13 +161,18 @@
             {required: true, message: '请输入学校名称', trigger: 'blur'},
             {min: 4, max: 200, message: '长度在 4 个字符到 20 个字符之间', trigger: 'blur'}
           ],
-        }
+        },
+        schoolOptions: []
       };
     },
     created() {
       if (this.$store.state.token != '') {  // 已登录则默认回到主页
         this.$router.push("/");
       }
+      var that = this;
+      this.$http.get('static/options/schoolOptions.json').then(res => {
+        that.schoolOptions = res.body;
+      })
     }
   }
 </script>

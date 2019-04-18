@@ -97,7 +97,7 @@ public class TeamServiceImpl implements TeamService {
         if (teamMapper.select(teamId).getCaptainId().equals(captainId)) {
             if (status.equals("同意")) {
                 teammateMapper.update(teamId, userId, "已加入");
-                teammateMapper.delete(null, userId, "审批中");
+                //teammateMapper.delete(null, userId, "审批中");
             } else if (status.equals("拒绝")){
                 teammateMapper.delete(teamId, userId, "审批中");
             } else if (status.equals("移出")){

@@ -7,7 +7,7 @@
         <h2>{{ post.title }}</h2>
         <div style="display: flex;">
           <img src="@/assets/user.png" class="img-user"/>
-          <span class="span-nickname">{{ post.school }} - {{ post.nickname }}</span>
+          <span class="span-nickname">{{ post.school.split("_")[2] }} - {{ post.nickname }}</span>
         </div>
         <div class="div-content">
           <div v-html='post.content'></div>

@@ -10,9 +10,9 @@
           <p>{{ userData.email }}</p>
           <el-form class="form-edit" :model="userData">
             <el-form-item class="item-form">
-              <el-input placeholder="请输入就读院校" prefix-icon="el-icon-location" v-model="userData.school"
-                        size="mini" maxlength="20" :disabled="!editVisible">
-              </el-input>
+              <el-input v-if="!editVisible" size="mini" :value="userData.school ? userData.school.split('_')[2] : null" disabled></el-input>
+              <el-cascader v-if="editVisible" placeholder="选择就读学校" :options="schoolOptions" filterable
+                           size="mini" :show-all-levels=false @change="onSchoolChange"></el-cascader>
             </el-form-item>
             <el-form-item class="item-form">
               <el-input placeholder="请输入联系电话" prefix-icon="el-icon-phone" v-model="userData.telNumber"
@@ -20,7 +20,8 @@
               </el-input>
             </el-form-item>
             <el-form-item class="item-form">
-              <el-button size="mini" @click="selectSkillsDialogVisible = true" :disabled="!editVisible">选择个人擅长技能</el-button>
+              <el-input v-if="!editVisible" size="mini" :value="parseSkills(skillsSelected)"  disabled></el-input>
+              <el-button size="mini" @click="selectSkillsDialogVisible = true" v-if="editVisible">选择个人擅长技能</el-button>
               <el-dialog title="选择个人擅长技能" :visible.sync="selectSkillsDialogVisible" width="45%" center>
                 <el-transfer v-model="skillsSelected" :data="skillOptions" :titles="skillsTitle"></el-transfer>
                 <span slot="footer" class="dialog-footer">
@@ -207,10 +208,18 @@
           console.log(errRes.status);
         });
       },
+      parseSkills(skills) {
+        var res = new Array();
+        for(var j = 0; j < skills.length; j++){
+          res.push(skills[j].split("_")[1]);
+        }
+        return res.join(",");
+      },
       updateUserData() {
         var that = this;
         this.userData.skills = this.skillsSelected.join(",");
         let params = this.userData;
+        console.log(params);
         requestUpdateData(params).then(function(successRes){
           if (successRes.body.code === 1) {
             that.$notify.success({
@@ -374,6 +383,9 @@
         this.getMessages();
         this.getMessagesMaxPage();
       },
+      onSchoolChange(value) {
+        this.userData.school = value[2];
+      },
     },
     data() {
       return {
@@ -398,19 +410,19 @@
         selectSkillsDialogVisible: false,
         skillsTitle: ['技能可选项','已选择技能'],
         skillsSelected: [],
-        skillOptions: [{key: '数学建模',label:'数学建模'}, {key: '程序设计',key:'程序设计'}, {key: '机器人',label:'机器人'},
-          {key: '工程机械',key:'工程机械'}, {key: '土木建筑',key:'土木建筑'},{key: '大数据',label:'大数据'},
-          {key: '交通车辆',label:'交通车辆'}, {key: '航空航天',label:'航空航天'}, {key: '船舶海洋',label:'船舶海洋'},
-          {key: '环境能源',label:'环境能源'}, {key: '计算机与信息技术',label:'计算机与信息技术'},
-          {key: '材料高分子',label:'材料高分子'},{key: '电子与自动化',label:'电子与自动化'},
-          {key: '工业与创意设计',label:'工业与创意设计'}, {key: '外语',label:'外语'},
-          {key: '演讲主持与辩论',label:'演讲主持与辩论'}, {key: '模特',label:'模特'},
-          {key: '歌舞书画与摄影',label:'歌舞书画与摄影'},
-          {key: '体育',label:'体育'}, {key: 'UI设计',label:'UI设计'}, {key: '服装设计',label:'服装设计'},
-          {key: '电子竞技',label:'电子竞技'},{key: '数学',label:'数学'}, {key: '物理',label:'物理'},
-          {key: '化学化工',label:'化学化工'},{key: '健康生命与医学',label:'健康生命与医学'}, {key: '力学',label:'力学'},
-          {key: '创业',label:'创业'}, {key: '商业',label:'商业'},{key: '职业技能',label:'职业技能'},
-          {key: '环保公益',label:'环保公益'}, {key: '社会综合',label:'社会综合'}
+        skillOptions: [{key: '工科_数学建模_000',label:'数学建模'}, {key: '工科_程序设计_001',key:'程序设计'}, {key: '工科_机器人_002',label:'机器人'},
+          {key: '工科_工程机械_003',key:'工程机械'}, {key: '工科_土木建筑_004',key:'土木建筑'},{key: '工科_大数据_005',label:'大数据'},
+          {key: '工科_交通车辆_006',label:'交通车辆'}, {key: '工科_航空航天_007',label:'航空航天'}, {key: '工科_船舶海洋_008',label:'船舶海洋'},
+          {key: '工科_环境能源_009',label:'环境能源'}, {key: '工科_计算机与信息技术_010',label:'计算机与信息技术'},
+          {key: '工科_材料高分子_011',label:'材料高分子'},{key: '工科_电子与自动化_012',label:'电子与自动化'},
+          {key: '文体_工业与创意设计_100',label:'工业与创意设计'}, {key: '文体_外语_101',label:'外语'},
+          {key: '文体_演讲主持与辩论_102',label:'演讲主持与辩论'}, {key: '文体_模特_103',label:'模特'},
+          {key: '文体_歌舞书画与摄影_104',label:'歌舞书画与摄影'},
+          {key: '文体_体育_105',label:'体育'}, {key: '文体_UI设计_106',label:'UI设计'}, {key: '文体_服装设计_107',label:'服装设计'},
+          {key: '文体_电子竞技_108',label:'电子竞技'},{key: '理科_数学_200',label:'数学'}, {key: '理科_物理_201',label:'物理'},
+          {key: '理科_化学化工_202',label:'化学化工'},{key: '理科_健康生命与医学_203',label:'健康生命与医学'}, {key: '理科_力学_204',label:'力学'},
+          {key: '商科_创业_300',label:'创业'}, {key: '商科_商业_301',label:'商业'},{key: '综合_职业技能_400',label:'职业技能'},
+          {key: '综合_环保公益_401',label:'环保公益'}, {key: '综合_社会综合_402',label:'社会综合'}
         ],
         messagesParams: {
           pageNumber: 1,
@@ -434,6 +446,7 @@
             {min: 6, message: '长度在 6 个字符以上', trigger: 'blur'}
           ],
         },
+        schoolOptions: [],
       };
     },
     created() {
@@ -448,8 +461,15 @@
         this.getMyTeamsMaxPage();
         this.getMessages();
         this.getMessagesMaxPage();
+        var that = this;
+        this.$http.get('static/options/schoolOptions.json').then(res => {
+          that.schoolOptions = res.body;
+        })
       }
     },
+    mounted() {
+
+    }
   }
 </script>
 

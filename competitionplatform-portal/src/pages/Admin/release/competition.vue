@@ -68,6 +68,16 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="竞赛信息" label-position="top" prop="details">
+          <el-upload
+            class="upload"
+            :before-upload="beforeUpload"
+            accept="image/jpg,image/jpeg,image/png"
+            :headers="uploadHeader"
+            action="http://localhost:80/competitionplatform/api/image/upload"
+            :on-success="handleSuccess"
+            :show-file-list="false">
+            <el-button size="small" type="primary" class="upload-btn"></el-button>
+          </el-upload>
           <quill-editor v-model="form.details" ref="quillEditor" :options="editorOption"></quill-editor>
         </el-form-item>
         <el-form-item class="item-button">
@@ -193,9 +203,23 @@
         ],
         editorOption: {
           modules:{
-            toolbar:[
-              ['bold', 'italic', 'underline'],
-            ]
+            toolbar: {
+              container: [
+                ['bold', 'italic', 'underline'],
+                ['blockquote', 'code-block'],
+                ['image']
+              ],
+              handlers: {
+                'image': function (value) {
+                  if (value) {
+                    // 调用图片上传
+                    document.querySelector('.upload-btn').click()
+                  } else {
+                    this.quill.format('image', false);
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -207,10 +231,46 @@
     },
     mounted() {
       this.editor.container.style.height = '300px';
+    },
+    methods: {
+      handleSuccess (res) {
+        // 获取富文本组件实例
+        let quill = this.$refs.quillEditor.quill;
+        // 如果上传成功
+        if (res) {
+          // 获取光标所在位置
+          let length = quill.getSelection().index;
+          // 插入图片，res为服务器返回的图片链接地址
+          quill.insertEmbed(length, 'image', `http://localhost:80/${res.url}`);
+          // 调整光标到最后
+          quill.setSelection(length + 1);
+        } else {
+          this.$message('图片插入失败');
+        }
+      },
+      beforeUpload(file) {
+        //文件上传之前调用做一些拦截限制
+        let isImg = false;
+        if (file.type != 'image/jpeg' || file.type != 'image/jpg' || file.type != 'image/png') {
+          isImg = true;
+        }
+        const isLt4M = file.size / 1024 / 1024 < 4;
+
+        if (!isImg) {
+          this.$message.error('上传文件只能是 JPG/JPEG/PNG 格式!');
+        }
+        if (!isLt4M) {
+          this.$message.error('上传图片大小不能超过 4MB!');
+        }
+        return isImg && isLt4M;
+      },
     }
   }
 </script>
 
 <style scoped>
 
+  .upload {
+    display: none;
+  }
 </style>
